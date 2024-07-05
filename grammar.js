@@ -305,7 +305,7 @@ module.exports = grammar({
       choice(
         $.in_expr,
         ...infix_ops.map(([op, op_prec]) =>
-          prec.left(op_prec, seq($.sub_expr, op, $.sub_expr)),
+          prec.left(op_prec, seq($.sub_expr, field("op", op), $.sub_expr)),
         ),
       ),
     in_expr: ($) =>
@@ -336,21 +336,6 @@ module.exports = grammar({
     range_expr: ($) =>
       seq($.in_expr, "[", optional($.expr), "...", optional($.expr), "]"),
     inc_or_dec_expr: ($) => seq($.in_expr, $.inc_or_dec),
-    // in_expr: ($) => seq($.term, repeat($.term_suffix)),
-    // term_suffix: ($) =>
-    //   choice(
-    //     $.member_suffix,
-    //     $.apply_suffix,
-    //     $.index_suffix,
-    //     $.range_suffix,
-    //     $.inc_or_dec,
-    //   ),
-    // member_suffix: ($) =>
-    //   seq(".", choice($.ident_param, $.integer, $.operator)),
-    // apply_suffix: ($) => seq("(", optional($.exprs), ")"),
-    // index_suffix: ($) => seq("[", $.exprs, "]"),
-    // range_suffix: ($) =>
-    //   seq("[", optional($.expr), "...", optional($.expr), "]"),
     term: ($) =>
       seq(
         optional(choice($.inc_or_dec, "-", "!")),
@@ -397,7 +382,6 @@ module.exports = grammar({
     float: ($) => /-?(0|([1-9]\d*))(\.\d*)?([eE][\+-]?([0]|[1-9]\d*))?[fFdD]?/,
     string: ($) =>
       seq('"', repeat(choice($.hex_char, $.printable, $.escape, "'")), '"'),
-
     hex_char: ($) => /\\x[0-9A-Fa-f][0-9A-Fa-f]/,
     printable: ($) =>
       choice(

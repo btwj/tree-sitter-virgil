@@ -38,7 +38,7 @@
 
 ; Expressions
 (infix) @operator
-[
+(sub_expr op: [
     "=="
     "!="
     "+"
@@ -59,7 +59,7 @@
     ">>"
     ">>>"
     "!"
-] @operator
+] @operator)
 
 (member_expr
     field: (ident_param) @property)
