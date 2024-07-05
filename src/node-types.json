@@ -1021,11 +1021,6 @@
     "fields": {}
   },
   {
-    "type": "printable",
-    "named": true,
-    "fields": {}
-  },
-  {
     "type": "range_expr",
     "named": true,
     "fields": {},
@@ -1726,10 +1721,6 @@
     }
   },
   {
-    "type": " ",
-    "named": false
-  },
-  {
     "type": "!",
     "named": false
   },
@@ -1739,10 +1730,6 @@
   },
   {
     "type": "\"",
-    "named": false
-  },
-  {
-    "type": "#",
     "named": false
   },
   {
@@ -1759,10 +1746,6 @@
   },
   {
     "type": "#unboxed",
-    "named": false
-  },
-  {
-    "type": "$",
     "named": false
   },
   {
@@ -1922,10 +1905,6 @@
     "named": false
   },
   {
-    "type": "@",
-    "named": false
-  },
-  {
     "type": "[",
     "named": false
   },
@@ -1955,10 +1934,6 @@
   },
   {
     "type": "_",
-    "named": false
-  },
-  {
-    "type": "`",
     "named": false
   },
   {
@@ -2052,6 +2027,10 @@
   {
     "type": "null",
     "named": false
+  },
+  {
+    "type": "printable",
+    "named": true
   },
   {
     "type": "private",
