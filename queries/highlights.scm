@@ -5,6 +5,7 @@
 [
     "enum"
     "type"
+    "case"
 ] @keyword
 (variant_decl
     name: (ident_param) @enum)
@@ -16,6 +17,8 @@
     "class"
     "def"
     "private"
+    "component"
+    "extends"
 ] @keyword
 (class_decl
     name: (ident_param) @class)
@@ -34,6 +37,7 @@
     "while"
     "for"
     "new"
+    "in"
 ] @keyword
 
 ; Expressions
@@ -97,6 +101,12 @@
 (type_args_enclosed
   "<" @punctuation.bracket
   ">" @punctuation.bracket)
+[
+    "#unboxed"
+    "#boxed"
+    "#packing"
+    "#packed"
+] @keyword
 (annotation) @storage.modifier
 
 [
@@ -114,4 +124,5 @@
     ","
     ";"
     "->"
+    "=>"
 ] @punctuation.delimiter

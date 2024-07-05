@@ -132,7 +132,7 @@
         "required": false,
         "types": [
           {
-            "type": "type_ref",
+            "type": "ident_param",
             "named": true
           }
         ]

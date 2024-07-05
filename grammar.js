@@ -49,7 +49,7 @@ module.exports = grammar({
         optional(
           seq(
             "extends",
-            field("extendsType", $.type_ref),
+            field("extendsType", $.ident_param),
             optional(field("extendsTypeParams", $.tuple_expr)),
           ),
         ),

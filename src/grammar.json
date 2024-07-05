@@ -109,7 +109,7 @@
                   "name": "extendsType",
                   "content": {
                     "type": "SYMBOL",
-                    "name": "type_ref"
+                    "name": "ident_param"
                   }
                 },
                 {
