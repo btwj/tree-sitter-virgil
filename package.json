@@ -42,7 +42,13 @@
   "tree-sitter": [
     {
       "scope": "source.virgil",
-      "injection-regex": "^virgil$"
+      "injection-regex": "^virgil$",
+      "file-types": [
+        "v3"
+      ],
+      "highlights": "queries/highlights.scm",
+      "locals": "queries/locals.scm",
+      "tags": "queries/tags.scm"
     }
   ]
 }

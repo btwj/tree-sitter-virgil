@@ -71,7 +71,7 @@ module.exports = grammar({
         "type",
         field("name", $.ident_param),
         optional(seq("(", optional(field("decls", $.param_decls)), ")")),
-        optional($.boxing_mode),
+        optional($.annotations),
         "{",
         field("members", repeat($.variant_member)),
         "}",
@@ -116,7 +116,7 @@ module.exports = grammar({
         "case",
         field("name", $.identifier),
         optional(seq("(", optional(field("decls", $.param_decls)), ")")),
-        optional($.boxing_mode),
+        optional($.annotations),
         choice(";", seq("{", field("method", repeat($.def_method)), "}")),
       ),
     enum_case: ($) =>
@@ -155,10 +155,7 @@ module.exports = grammar({
     new_param_decls: ($) =>
       seq($.new_param_decl, repeat(seq(",", $.new_param_decl))),
     ident_param: ($) =>
-      seq(
-        field("name", $.identifier),
-        optional(seq("<", field("typeArgs", $.type_args), ">")),
-      ),
+      seq(field("name", $.identifier), optional($.type_args_enclosed)),
     type_ref: ($) =>
       prec.left(
         1,
@@ -175,6 +172,7 @@ module.exports = grammar({
           field("function", repeat(seq("->", $.type_ref))),
         ),
       ),
+    type_args_enclosed: ($) => seq("<", $.type_args, ">"),
     type_args: ($) => seq($.type_ref, repeat(seq(",", $.type_ref))),
 
     var_decl: ($) =>
@@ -310,13 +308,49 @@ module.exports = grammar({
           prec.left(op_prec, seq($.sub_expr, op, $.sub_expr)),
         ),
       ),
-    in_expr: ($) => seq($.term, repeat($.term_suffix)),
-    term_suffix: ($) =>
-      choice($.member_suffix, $.apply_suffix, $.index_suffix, $.inc_or_dec),
-    member_suffix: ($) =>
-      seq(".", choice($.ident_param, $.integer, $.operator)),
-    apply_suffix: ($) => seq("(", optional($.exprs), ")"),
-    index_suffix: ($) => seq("[", $.exprs, "]"),
+    in_expr: ($) =>
+      choice(
+        $.apply_expr,
+        $.member_expr,
+        $.index_expr,
+        $.range_expr,
+        $.inc_or_dec_expr,
+        $.term,
+      ),
+    member_expr: ($) =>
+      prec.left(
+        0,
+        seq(
+          $.in_expr,
+          ".",
+          field("field", choice($.ident_param, $.integer, $.operator)),
+        ),
+      ),
+    apply_expr: ($) =>
+      prec.left(
+        0,
+        seq(field("callee", $.in_expr), "(", optional($.exprs), ")"),
+      ),
+    index_expr: ($) =>
+      prec.left(0, seq($.in_expr, "[", optional($.exprs), "]")),
+    range_expr: ($) =>
+      seq($.in_expr, "[", optional($.expr), "...", optional($.expr), "]"),
+    inc_or_dec_expr: ($) => seq($.in_expr, $.inc_or_dec),
+    // in_expr: ($) => seq($.term, repeat($.term_suffix)),
+    // term_suffix: ($) =>
+    //   choice(
+    //     $.member_suffix,
+    //     $.apply_suffix,
+    //     $.index_suffix,
+    //     $.range_suffix,
+    //     $.inc_or_dec,
+    //   ),
+    // member_suffix: ($) =>
+    //   seq(".", choice($.ident_param, $.integer, $.operator)),
+    // apply_suffix: ($) => seq("(", optional($.exprs), ")"),
+    // index_suffix: ($) => seq("[", $.exprs, "]"),
+    // range_suffix: ($) =>
+    //   seq("[", optional($.expr), "...", optional($.expr), "]"),
     term: ($) =>
       seq(
         optional(choice($.inc_or_dec, "-", "!")),
@@ -335,7 +369,7 @@ module.exports = grammar({
     operator: ($) =>
       prec(2, choice($.infix, $.cast_or_query, "-", "~", "[]", "[]=")),
     cast_or_query: ($) =>
-      prec.left(2, seq(choice("!", "?"), optional(seq("<", $.type_args, ">")))),
+      prec.right(1, seq(choice("!", "?"), optional($.type_args_enclosed))),
     assign: ($) =>
       choice(
         "=",
@@ -354,17 +388,52 @@ module.exports = grammar({
       ),
     infix: ($) => choice(...infix_ops.map((op) => op[0])),
 
-    boxing_mode: ($) => choice("#unboxed", "#boxed", "#packed"),
+    // TODO: packing annotations
+    annotations: ($) => seq($.annotation),
+    annotation: ($) => choice("#unboxed", "#boxed", "#packed", "#packing"),
     identifier: ($) => /[a-zA-Z]\w*/,
-    char: ($) => seq("'", choice($.hex_char, $.printable, $.escape), "'"),
+    char: ($) => seq("'", choice($.hex_char, $.printable, $.escape, '"'), "'"),
     integer: ($) => /0|-?([1-9][0-9]*|0x[a-fA-F0-9]+)[uU]?[lL]?/,
     float: ($) => /-?(0|([1-9]\d*))(\.\d*)?([eE][\+-]?([0]|[1-9]\d*))?[fFdD]?/,
     string: ($) =>
-      seq('"', repeat(choice($.hex_char, $.printable, $.escape)), '"'),
+      seq('"', repeat(choice($.hex_char, $.printable, $.escape, "'")), '"'),
 
     hex_char: ($) => /\\x[0-9A-Fa-f][0-9A-Fa-f]/,
-    printable: ($) => choice(/[A-Za-z0-9]/, "`", "~", "!", "@", " "),
-    escape: ($) => seq('"', /[rnbt'"]/),
+    printable: ($) =>
+      choice(
+        /[A-Za-z0-9]/,
+        "`",
+        "~",
+        "!",
+        "@",
+        " ",
+        "%",
+        "$",
+        "-",
+        "_",
+        "*",
+        "(",
+        ")",
+        "|",
+        "#",
+        "^",
+        "&",
+        "[",
+        "]",
+        "=",
+        ":",
+        ";",
+        ",",
+        "?",
+        "<",
+        ">",
+        "{",
+        "}",
+        "+",
+        ".",
+        "/",
+      ),
+    escape: ($) => seq("\\", /[rnbt'"]/),
     comment: ($) =>
       token(
         choice(seq("//", /.*/), seq("/*", /[^*]*\*+([^/*][^*]*\*+)*/, "/")),
