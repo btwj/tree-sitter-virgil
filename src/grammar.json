@@ -3308,7 +3308,7 @@
       "members": [
         {
           "type": "PATTERN",
-          "value": "[A-Za-z0-9]"
+          "value": "[A-Za-z0-9\\(\\)\\[\\]\\{\\}]"
         },
         {
           "type": "STRING",
@@ -3352,14 +3352,6 @@
         },
         {
           "type": "STRING",
-          "value": "("
-        },
-        {
-          "type": "STRING",
-          "value": ")"
-        },
-        {
-          "type": "STRING",
           "value": "|"
         },
         {
@@ -3373,14 +3365,6 @@
         {
           "type": "STRING",
           "value": "&"
-        },
-        {
-          "type": "STRING",
-          "value": "["
-        },
-        {
-          "type": "STRING",
-          "value": "]"
         },
         {
           "type": "STRING",
@@ -3409,14 +3393,6 @@
         {
           "type": "STRING",
           "value": ">"
-        },
-        {
-          "type": "STRING",
-          "value": "{"
-        },
-        {
-          "type": "STRING",
-          "value": "}"
         },
         {
           "type": "STRING",
